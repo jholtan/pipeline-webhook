@@ -1,0 +1,25 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: pipeline-eventlistener
+spec:
+  serviceAccountName: pipeline-trigger
+  triggerGroups:
+    - name: bitbucket-pull-requests
+      interceptors:
+        - name: bitbucket
+          ref:
+            name: bitbucket
+            kind: ClusterInterceptor
+          params:
+            - name: secretRef
+              value:
+                secretName: bitbucket-webhook-secret
+                secretKey: token
+            - name: eventTypes
+              value: ["pr:merged"]
+      triggerSelector:
+        labelSelector:
+          matchLabels:
+            eventlistener: bitbucket-pull-request
